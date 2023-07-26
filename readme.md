@@ -6,26 +6,15 @@
 <b>Step1</b>. AndroidStudio项目配置：  &nbsp;&nbsp;&nbsp;&nbsp;  
 需要minSdkVersion>=24
 
-Step2. 混淆配置配置：  
+<b>Step2</b>. 混淆配置配置：  
 参考demo项目中的app/proguard-rules.pro。
 
-Step3. 导入aar  
+<b>Step3</b>. 导入aar  
 导入contentcreator.aar和播放器aar，并依赖这两个aar。具体参见附件里的demo：
 :localaar:contentcreator项目里的contentcreator-release.aar是生产组件
 :localaar:mediaplayer项目里的streamlake-mediaplayer-1.8.0.9.aar是播放器
 
-Ste4. 依赖公共plugin  
-contentcreator依赖以下公共插件
-在你的app/build.gradle添加以下依赖
-```
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-dependencies {
-   implementation 'androidx.appcompat:appcompat:1.1.0'
-   kapt "androidx.room:room-compiler:2.2.5"
-}
-```
+<b>Step4</b>. execlude掉一些组件
 如果您的仓库依赖以下组件，请先统一将其做exclude处理
 ```
 configurations.all {
@@ -38,14 +27,14 @@ configurations.all {
 ```
 
 
-Step5. 添加所需权限权限	  
+<b>Step5</b>. 添加所需权限权限	  
 访问网络  
 `<uses-permission android:name="android.permission.INTERNET"/>`
 
 获取网络状态  
 `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>`
    
-Step6. 依赖公共三方库  
+<b>Step6</b>. 依赖公共三方库  
 导入公共依赖，其中版本可能会有冲突，需要针对具体的case做一些class冲突错误的fix，具体参见demo中的 `app/common_dependency.gradle`
 
 
@@ -75,8 +64,7 @@ CreativeEngine、KSMediaPlayerInit.
    这一步是设置视频编辑的回调。在视频编辑页，完成视频编辑后，生成一个mp4产物，存储在手机sd卡里，生产组件会把改视频文件的绝对路径用String类型的变量通过该接口通知给业务层，业务层拿到该String可以做一些业务的相关处理，比如上传、发布、发动态等。
 
 
-
-## 四 生产组件使用
+## 三 生产组件使用
 生产组件主要提供三个Activity页面：
 1. 拍摄录制页
    调用代码示例,CreativeEngine#startCameraActivity：
@@ -105,7 +93,31 @@ CreativeEngine、KSMediaPlayerInit.
    }
    ```
 
-## 四 常见问题&注意事项
+## 四 生产组件美颜api
+生产组件具有美颜能力，以及相关暴露给业务的美颜api接口。暴露给业务使用的美颜接口类是`ICcBeautyEngine.java`，使用接口之前需要构造出一个接口实例，可以参考demo项目的代码EngineMgr.java：`CcBeautyFactory.createDefaultSdk(context)`。有了实例，就可以调用美颜相关api。
+
+总共有以下几个api：
+
+1. ICcBeautyEngine#initInGlThread()
+   初始化接口，需要在gl线程调用
+
+1. ICcBeautyEngine#deliverTextureFrame(VideoFrame videoFrame)
+   推帧接口
+
+1. ICcBeautyEngine#addGLPreProcessor(AbstractPreProcessor... processors)添加processor插件
+
+1. ICcBeautyEngine#adjustBeauty(BeautifyConfig beautifyConfig)调节美颜参数
+
+1. ICcBeautyEngine#adjustFilter(FilterConfig config)调节滤镜参数
+
+1. ICcBeautyEngine#adjustMagic(MagicEmoji.MagicFace face, String path)调节魔表参数
+
+1. ICcBeautyEngine#release()释放美颜示例
+
+api的具体调用细节可以参考demo项目里的`ToBBeautyFrg.java`和`MyGlSurfaceView.java`这两个类。
+
+
+## 五 常见问题&注意事项
 1. 生产组件和开源sdk：com.noober.background:core 存在冲突，解决方案是把该sdk的代码和资源复制到客户的项目中，并把冲突的资源重命名，declare-styleable命名加上noober_前缀，
 2. 生产组件可能会跟客户的一些so静态库冲突，可以在app/build.gradle中使用pickFirst 'lib/*/xxx.so'解决
 
