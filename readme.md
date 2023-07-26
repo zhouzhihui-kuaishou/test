@@ -3,7 +3,7 @@
 该demo工程提供了可直接运行的一个app项目，具体的接口调用时序请参照demo工程，包含了生产组件和播放器两个aar。
 
 ## 一 集成准备
-Step1. AndroidStudio项目配置：  &nbsp;&nbsp;&nbsp;&nbsp;  
+<b>Step1</b>. AndroidStudio项目配置：  &nbsp;&nbsp;&nbsp;&nbsp;  
 需要minSdkVersion>=24
 
 Step2. 混淆配置配置：  
